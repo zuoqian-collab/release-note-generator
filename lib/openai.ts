@@ -201,7 +201,7 @@ WRITING STYLE:
 - Start with action verbs: "Added", "Use", "Improved", "Now supports"
 
 OUTPUT FORMAT:
-Return a JSON object with this structure:
+Return a JSON object with this structure. MUST follow this exact order: all → mobile → desktop
 {
   "highlights": [
     {
@@ -223,6 +223,7 @@ Return a JSON object with this structure:
 }
 
 IMPORTANT:
+- MUST maintain order: "all" first, then "mobile", then "desktop"
 - Include ALL three platform sections (all, mobile, desktop) if features exist for each
 - Maximum 3 bullet items per platform
 - Each bullet item must be short (one line, under 15 words)

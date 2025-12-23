@@ -75,6 +75,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sort highlights to ensure order: all → mobile → desktop
+    const platformOrder: Record<string, number> = { 'all': 0, 'mobile': 1, 'desktop': 2 };
+    emailHighlights.sort((a, b) => {
+      const orderA = platformOrder[a.platform] ?? 99;
+      const orderB = platformOrder[b.platform] ?? 99;
+      return orderA - orderB;
+    });
+
     console.log(`Extracted ${emailHighlights.length} highlights.`);
 
     // Generate full email HTML
