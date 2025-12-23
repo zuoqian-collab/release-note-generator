@@ -52,6 +52,18 @@ export interface GeneratedReleaseNotes {
   officialDesktop: string;
   officialIOS: string;
   officialAndroid: string;
+  emailHtml: string;
+}
+
+// Email highlight item structure
+export interface EmailHighlightItem {
+  platform: 'all' | 'mobile' | 'desktop';
+  emoji: string;
+  content: string;
+}
+
+export interface EmailHighlights {
+  highlights: EmailHighlightItem[];
 }
 
 export type TemplateType = 
@@ -60,7 +72,8 @@ export type TemplateType =
   | 'slack' 
   | 'officialDesktop' 
   | 'officialIOS'
-  | 'officialAndroid';
+  | 'officialAndroid'
+  | 'emailHtml';
 
 export interface TemplateConfig {
   id: TemplateType;
@@ -68,7 +81,7 @@ export interface TemplateConfig {
   description: string;
 }
 
-export type ChannelType = 'discord' | 'slack' | 'official';
+export type ChannelType = 'discord' | 'slack' | 'official' | 'email';
 
 export interface ChannelConfig {
   id: ChannelType;
@@ -126,6 +139,18 @@ export const CHANNEL_CONFIGS: ChannelConfig[] = [
         id: 'officialDesktop',
         name: 'Desktop',
         description: 'Mac/Windows, English'
+      }
+    ]
+  },
+  {
+    id: 'email',
+    name: 'Email',
+    icon: 'email',
+    templates: [
+      {
+        id: 'emailHtml',
+        name: 'HTML Newsletter',
+        description: 'Weekly update email'
       }
     ]
   }

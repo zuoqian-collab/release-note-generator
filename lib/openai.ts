@@ -15,7 +15,7 @@ PLATFORM RULES - CRITICAL:
   * These items MUST be added to iOS, Mac, AND Android arrays
   * Example: If【多端】has 3 items under "New" and【iOS】has 1 item, then iosNew should have 4 items total (3+1)
 - "【iOS】" means iOS only (mobile app) - only add to iOS arrays
-- "【Mac】" means Mac/Desktop only (also applies to Windows desktop app) - only add to Mac arrays
+- "【Mac】/ 【PC】" means Mac/Desktop only (also applies to Windows desktop app) - only add to Mac arrays
 - "【Android】" means Android only - only add to Android arrays
 - "New" section = new features
 - "Improvements" section = improvements/optimizations/enhancements  
@@ -168,3 +168,63 @@ IMPORTANT:
 - The number of items in each array must remain exactly the same
 - Every item must be rewritten to be professional and user-focused
 - Do NOT just translate literally - rewrite to sound natural and professional`;
+
+// Phase 3: Extract email highlights for newsletter
+export const EMAIL_HIGHLIGHT_PROMPT = `You are a marketing expert for a productivity email app called Filo. Your job is to extract notable features from release notes for a weekly update email.
+
+EXTRACTION RULES - CRITICAL:
+1. Extract features from NEW and IMPROVEMENTS sections ONLY (ignore Fixes)
+2. Categorize by platform:
+   - "all": Features that appear in ALL platforms (iosNew ∩ macNew ∩ androidNew, or iosImprovements ∩ macImprovements ∩ androidImprovements)
+     These are features that were originally marked as【多端】
+   - "mobile": Features ONLY in iOS (iosNew or iosImprovements that are NOT in mac arrays)
+   - "desktop": Features ONLY in Mac/Desktop (macNew or macImprovements that are NOT in ios arrays)
+
+3. If a feature appears in both iOS and Mac but NOT Android, categorize based on the primary platform
+
+CONTENT FORMAT RULES - CRITICAL:
+- Maximum 3 items per platform
+- Each item must be ONE short line (no more than 15 words)
+- If multiple items, use bullet list format with <br> between items:
+  "• Item one description.<br>• Item two description.<br>• Item three description."
+- If only ONE item, no bullet needed, just the description
+
+EMOJI RULES (FIXED per platform):
+- "all" platform: Always use 📍
+- "mobile" platform: Always use 📱
+- "desktop" platform: Always use 💻
+
+WRITING STYLE:
+- Write in English
+- Be extremely concise - one short sentence per item
+- Focus on user benefits
+- Start with action verbs: "Added", "Use", "Improved", "Now supports"
+
+OUTPUT FORMAT:
+Return a JSON object with this structure:
+{
+  "highlights": [
+    {
+      "platform": "all",
+      "emoji": "📍",
+      "content": "Single feature or • Item 1.<br>• Item 2.<br>• Item 3."
+    },
+    {
+      "platform": "mobile",
+      "emoji": "📱", 
+      "content": "Single feature or • Item 1.<br>• Item 2."
+    },
+    {
+      "platform": "desktop",
+      "emoji": "💻",
+      "content": "• Added manual Fetch mail entry.<br>• Improved recipient display in replies.<br>• Added one-click Mark all done for To-Dos."
+    }
+  ]
+}
+
+IMPORTANT:
+- Include ALL three platform sections (all, mobile, desktop) if features exist for each
+- Maximum 3 bullet items per platform
+- Each bullet item must be short (one line, under 15 words)
+- Do NOT include bug fixes
+- Skip a platform section if no New/Improvement features exist for it`;
