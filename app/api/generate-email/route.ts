@@ -57,9 +57,29 @@ export async function POST(request: NextRequest) {
     let emailHighlights: EmailHighlightItem[] = [];
     
     try {
-      const highlightData = JSON.parse(highlightContent) as EmailHighlights;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const highlightData = JSON.parse(highlightContent) as { highlights: any[] };
       if (highlightData.highlights && Array.isArray(highlightData.highlights)) {
-        emailHighlights = highlightData.highlights;
+        // Normalize content to always be an array (in case AI returns string)
+        emailHighlights = highlightData.highlights.map(item => {
+          let contentArray: string[];
+          if (Array.isArray(item.content)) {
+            contentArray = item.content;
+          } else if (typeof item.content === 'string') {
+            // Parse string format: split by <br> and remove bullet points
+            contentArray = item.content
+              .split('<br>')
+              .map((s: string) => s.replace(/^[•\-]\s*/, '').trim())
+              .filter(Boolean);
+          } else {
+            contentArray = [];
+          }
+          return {
+            platform: item.platform,
+            emoji: item.emoji,
+            content: contentArray
+          } as EmailHighlightItem;
+        });
       }
     } catch {
       return NextResponse.json(

@@ -59,7 +59,7 @@ export interface GeneratedReleaseNotes {
 export interface EmailHighlightItem {
   platform: 'all' | 'mobile' | 'desktop';
   emoji: string;
-  content: string;
+  content: string[];  // Array of items - formatting handled by code
 }
 
 export interface EmailHighlights {

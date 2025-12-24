@@ -174,20 +174,43 @@ export const EMAIL_HIGHLIGHT_PROMPT = `You are a marketing expert for a producti
 
 EXTRACTION RULES - CRITICAL:
 1. Extract features from NEW and IMPROVEMENTS sections ONLY (ignore Fixes)
-2. Categorize by platform:
-   - "all": Features that appear in ALL platforms (iosNew ∩ macNew ∩ androidNew, or iosImprovements ∩ macImprovements ∩ androidImprovements)
-     These are features that were originally marked as【多端】
-   - "mobile": Features ONLY in iOS (iosNew or iosImprovements that are NOT in mac arrays)
-   - "desktop": Features ONLY in Mac/Desktop (macNew or macImprovements that are NOT in ios arrays)
+2. PRIORITIZE valuable, user-facing features worth promoting:
+   - NEW features are more important than minor improvements
+   - Focus on features that provide clear user value
+   - Skip technical or minor UI tweaks unless they're significant
+3. IGNORE Android completely - only consider iOS and Mac/PC features
+3. CAREFULLY compare iOS and Mac/PC feature lists - look for the SAME features:
+   - Read through ALL iOS features
+   - Read through ALL Mac/PC features
+   - Identify which features appear in BOTH (even with slightly different wording)
 
-3. If a feature appears in both iOS and Mac but NOT Android, categorize based on the primary platform
+4. Use SEMANTIC matching (not exact text matching!):
+   - "垃圾邮件的风险提示样式优化" in iOS = "垃圾邮件的风险提示样式优化" in PC → SAME feature
+   - "系统自动处理Todo状态的逻辑优化" in iOS = "系统自动处理Todo状态的逻辑优化" in PC → SAME feature
+   - "Filo Plus 订阅上线" in iOS = "Filo Plus 订阅上线" in PC → SAME feature
+
+5. Categorize by platform - STEP BY STEP:
+   STEP 1: Find ALL features that exist in BOTH iOS AND Mac/PC
+           → Put these in "all" platform
+   
+   STEP 2: Find features that ONLY exist in iOS (not in Mac/PC at all)
+           → Put these in "mobile" platform
+   
+   STEP 3: Find features that ONLY exist in Mac/PC (not in iOS at all)
+           → Put these in "desktop" platform
+
+6. CRITICAL - NO DUPLICATES:
+   - Each unique feature appears in ONLY ONE category
+   - If a feature exists in both iOS and Mac/PC → MUST go to "all", NOT in mobile or desktop
+   - Never repeat the same feature across different categories
+
+7. Do NOT include any Android-only features
 
 CONTENT FORMAT RULES - CRITICAL:
 - Maximum 3 items per platform
 - Each item must be ONE short line (no more than 15 words)
-- If multiple items, use bullet list format with <br> between items:
-  "• Item one description.<br>• Item two description.<br>• Item three description."
-- If only ONE item, no bullet needed, just the description
+- Return content as an ARRAY of strings (formatting will be handled by code)
+- Do NOT add bullet points, line breaks, or any formatting - just plain text strings
 
 EMOJI RULES (FIXED per platform):
 - "all" platform: Always use 📍
@@ -202,30 +225,46 @@ WRITING STYLE:
 
 OUTPUT FORMAT:
 Return a JSON object with this structure. MUST follow this exact order: all → mobile → desktop
+
+EXAMPLE:
+Given:
+{
+  "iosNew": ["智能邮件摘要上线"],
+  "iosImprovements": ["搜索结果排序优化"],
+  "macNew": ["智能邮件摘要上线", "批量邮件操作"],
+  "macImprovements": ["搜索结果排序优化", "快捷键支持"]
+}
+
+Correct categorization:
 {
   "highlights": [
     {
       "platform": "all",
       "emoji": "📍",
-      "content": "Single feature or • Item 1.<br>• Item 2.<br>• Item 3."
-    },
-    {
-      "platform": "mobile",
-      "emoji": "📱", 
-      "content": "Single feature or • Item 1.<br>• Item 2."
+      "content": [
+        "AI-powered smart email summaries are now available.",
+        "Improved search result ranking for faster access."
+      ]
     },
     {
       "platform": "desktop",
       "emoji": "💻",
-      "content": "• Added manual Fetch mail entry.<br>• Improved recipient display in replies.<br>• Added one-click Mark all done for To-Dos."
+      "content": [
+        "New bulk email actions for efficient message management.",
+        "Added keyboard shortcut support for faster operations."
+      ]
     }
   ]
 }
 
+Note: The "mobile" section is omitted because iOS has no unique features (all iOS features also exist in Mac).
+
 IMPORTANT:
 - MUST maintain order: "all" first, then "mobile", then "desktop"
-- Include ALL three platform sections (all, mobile, desktop) if features exist for each
-- Maximum 3 bullet items per platform
-- Each bullet item must be short (one line, under 15 words)
+- ONLY include platforms that have actual features
+- If a platform has NO features, DO NOT include it in the output at all
+- NEVER output placeholder text like "No notable features" - just omit the platform entirely
+- Maximum 3 items per platform (as array elements)
+- Each item must be short (one line, under 15 words)
 - Do NOT include bug fixes
-- Skip a platform section if no New/Improvement features exist for it`;
+- Return content as array of strings, NOT as formatted text`;

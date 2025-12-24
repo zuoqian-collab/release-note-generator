@@ -177,6 +177,17 @@ export function generateOfficialAndroid(data: ParsedReleaseNotes): string {
 ${newSection}${improvementsSection}${fixesSection}`.trim();
 }
 
+// Format content array: add bullet points only if more than 1 item
+function formatEmailContent(contentArray: string[]): string {
+  if (contentArray.length === 0) return '';
+  if (contentArray.length === 1) {
+    // Single item: no bullet point
+    return contentArray[0];
+  }
+  // Multiple items: add bullet points with <br> between
+  return contentArray.map(item => `• ${item}`).join('<br>');
+}
+
 // Generate Email HTML card content from highlights
 export function generateEmailCardHtml(highlights: EmailHighlightItem[]): string {
   const platformLabels: Record<string, string> = {
@@ -185,15 +196,18 @@ export function generateEmailCardHtml(highlights: EmailHighlightItem[]): string 
     'desktop': 'Desktop'
   };
 
-  const rows = highlights.map(item => `																		<tr>
+  const rows = highlights.map(item => {
+    const formattedContent = formatEmailContent(item.content);
+    return `																		<tr>
 																			<td style="padding: 10px 0; vertical-align: top; width: 36px;">
 																				<span style="font-size: 20px;">${item.emoji}</span>
 																			</td>
 																			<td style="padding: 10px 0; vertical-align: top;">
 																				<strong style="color: #0D93F3;">${platformLabels[item.platform] || item.platform}</strong><br>
-																				<span style="color: #002346;">${item.content}</span>
+																				<span style="color: #002346;">${formattedContent}</span>
 																			</td>
-																		</tr>`).join('\n');
+																		</tr>`;
+  }).join('\n');
 
   return `<div style="background-color: #EEF9FF; border-radius: 12px; padding: 20px 24px; margin: 20px 0; border-left: 4px solid #22A0FB;">
 																	<table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #002346; line-height: 1.6;">
